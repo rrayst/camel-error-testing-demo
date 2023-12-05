@@ -39,7 +39,7 @@ class OnlyStepTwoTest {
         mockTest.expectedMessageCount(1);
 
         mockTest.expectedMessagesMatches(
-                body().convertToString().isEqualTo("demo1subroute,demo2"));
+                body().convertToString().isEqualTo("demo1,demo2subroute"));
 
         final NotifyBuilder notifyBuilder = new NotifyBuilder(cc)
                 .whenDone(1)
@@ -85,7 +85,7 @@ class OnlyStepTwoTest {
                                     public void configure() throws Exception {
                                         weaveById("setbody")
                                                 .before()
-                                                .filter(exchangeProperty(SPLIT_INDEX).isEqualTo(1))
+                                                .filter(exchangeProperty(SPLIT_INDEX).isEqualTo(0))
                                                     .throwException(new ConnectException());
 
                                     }

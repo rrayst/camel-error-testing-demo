@@ -7,6 +7,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class DemoRouteBuilder extends RouteBuilder {
@@ -39,10 +40,21 @@ public class DemoRouteBuilder extends RouteBuilder {
         };
     }
 
-    private FlexibleAggregationStrategy listAggregationStrategy() {
-        return new FlexibleAggregationStrategy()
-                .storeInBody()
-                .pick(simple("${body}"))
-                .accumulateInCollection(ArrayList.class);
+    private AggregationStrategy listAggregationStrategy() {
+        return new AggregationStrategy() {
+            @Override
+            public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
+                if (oldExchange == null) {
+                    List body = new ArrayList();
+                    body.add(newExchange.getIn().getBody());
+                    newExchange.getIn().setBody(body);
+                    newExchange.setException(null); // required so that the Exchange continues after the split()...end()
+                    return newExchange;
+                }
+                List body = oldExchange.getIn().getBody(List.class);
+                body.add(newExchange.getIn().getBody());
+                return oldExchange;
+            }
+        };
     }
 }
