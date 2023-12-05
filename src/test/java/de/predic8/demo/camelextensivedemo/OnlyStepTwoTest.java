@@ -17,7 +17,11 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
+import java.net.ConnectException;
+
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.apache.camel.Exchange.SPLIT_INDEX;
+import static org.apache.camel.builder.AdviceWith.adviceWith;
 import static org.apache.camel.builder.Builder.body;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -49,8 +53,6 @@ class OnlyStepTwoTest {
         assertTrue(done, "NotifyBuilder does NOT match!");
 
         mockTest.assertIsSatisfied();
-
-        System.out.println("");
     }
 
     @TestConfiguration
@@ -62,7 +64,7 @@ class OnlyStepTwoTest {
                 public void beforeApplicationStart(CamelContext camelContext) {
                     try {
                         camelContext.setTracing(true);
-                        AdviceWith.adviceWith(
+                        adviceWith(
                                 ((ModelCamelContext)camelContext).getRouteDefinition("mainRoute"),
                                 camelContext,
                                 new AdviceWithRouteBuilder() {
@@ -72,6 +74,20 @@ class OnlyStepTwoTest {
                                                 .skipSendToOriginalEndpoint()
                                                 .convertBodyTo(String.class)
                                                 .to("mock:test");
+                                    }
+                                });
+
+                        adviceWith(
+                                ((ModelCamelContext)camelContext).getRouteDefinition("subroute"),
+                                camelContext,
+                                new AdviceWithRouteBuilder() {
+                                    @Override
+                                    public void configure() throws Exception {
+                                        weaveById("setbody")
+                                                .before()
+                                                .filter(exchangeProperty(SPLIT_INDEX).isEqualTo(0))
+                                                    .throwException(new ConnectException());
+
                                     }
                                 });
                     } catch (Exception e) {

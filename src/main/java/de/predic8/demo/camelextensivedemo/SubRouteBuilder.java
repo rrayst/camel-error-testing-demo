@@ -8,6 +8,7 @@ public class SubRouteBuilder extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         from("direct:additionalInfo")
-                .setBody(constant("subroute"));
+                .routeId("subroute")
+                .setBody(constant("subroute")).id("setbody");
     }
 }
