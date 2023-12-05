@@ -45,7 +45,7 @@ class OnlyStepTwoTest {
                 .whenDone(1)
                 .create();
 
-        cc.createProducerTemplate().send("file:in", exchange -> {
+        cc.createProducerTemplate().send("direct:mainRoute", exchange -> {
             exchange.getIn().setBody("demo1\ndemo2");
         });
 
@@ -70,6 +70,8 @@ class OnlyStepTwoTest {
                                 new AdviceWithRouteBuilder() {
                                     @Override
                                     public void configure() throws Exception {
+                                        replaceFromWith("direct:mainRoute");
+
                                         interceptSendToEndpoint("file:out")
                                                 .skipSendToOriginalEndpoint()
                                                 .convertBodyTo(String.class)

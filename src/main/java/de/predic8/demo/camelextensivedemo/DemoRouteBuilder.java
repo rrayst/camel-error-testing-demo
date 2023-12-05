@@ -22,12 +22,6 @@ public class DemoRouteBuilder extends RouteBuilder {
                 .end()
                 .to("file:out");
         // @formatter:on
-
-        /*
-- erst stopOnEx, dann exc aggregieren
-
-- testen: wie interagieren exc policies mit exc handler
-         */
     }
 
     private AggregationStrategy appendAggregationStrategy() {
