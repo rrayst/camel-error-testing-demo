@@ -48,7 +48,6 @@ public class DemoRouteBuilder extends RouteBuilder {
                     List body = new ArrayList();
                     body.add(newExchange.getIn().getBody());
                     newExchange.getIn().setBody(body);
-                    newExchange.setException(null); // required so that the Exchange continues after the split()...end()
                     return newExchange;
                 }
                 List body = oldExchange.getIn().getBody(List.class);

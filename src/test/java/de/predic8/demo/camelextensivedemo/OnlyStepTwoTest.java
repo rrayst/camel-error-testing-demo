@@ -39,7 +39,7 @@ class OnlyStepTwoTest {
         mockTest.expectedMessageCount(1);
 
         mockTest.expectedMessagesMatches(
-                body().convertToString().isEqualTo("demo1,demo2subroute"));
+                body().convertToString().isEqualTo("demo1error,demo2subroute"));
 
         final NotifyBuilder notifyBuilder = new NotifyBuilder(cc)
                 .whenDone(1)
